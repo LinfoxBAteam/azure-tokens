@@ -1,0 +1,38 @@
+stations <- sweep_for_stations(latlon = c(-26.56, 151.93))
+stations <- subset(stations, distance <= 200)
+head(stations)
+
+station_data <- lapply(stations$site, 
+                       get_historical,
+                       type = "max")
+
+class(station_data)
+
+
+AUS_XML <- c(
+  "IDN11060.xml",# NSW
+  "IDD10207.xml",  # NT
+  "IDQ11295.xml",  # QLD
+  "IDS10044.xml",  # SA
+  "IDT16710.xml",  # TAS
+  "IDV10753.xml",  # VIC
+  "IDW14199.xml"  # WA
+)
+for(State in AUS_XML){
+curl::curl_download(
+  paste0("ftp://ftp.bom.gov.au/anon/gen/fwo/",State),
+  destfile = file.path(tempdir(), State),
+  mode = "wb"
+)}
+
+
+forecast1 <- get_precis_forecast(filepath = file.path(tempdir(),"/"))
+head(forecast1)
+forecast1 <- get_precis_forecast(filepath = file.path(tempdir())) # wrong filepath
+head(forecast1)
+forecastQ <- get_precis_forecast(state = "QLD", file.path(tempdir(),"/"))
+head(forecastQ)
+forecastQ <- get_precis_forecast(state = "QLD") # testing normal function
+head(forecastQ)
+forecast2 <- get_precis_forecast() # testing normal function
+head(forecast2)
